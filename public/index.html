@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+<form>
+    <table>
+        <tr>
+            <td>First Name:</td>
+            <td><input type="text" name="fnm" id="fnm"></td>
+        </tr>
+        <tr>
+            <td>Last Name:</td>
+            <td><input type="text" name="lnm" id="lnm"></td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td><input type="text" name="em" id="em"></td>
+        </tr>
+        <tr>
+            <td>State:</td>
+            <td><!--<input type="text" name="st" id="st">--><select id="st" name="st">
+                <option value="gujarat">--Select State--</option>
+                <option value="gujarat">Gujarat</option>
+            </select> </td>
+        </tr>
+        <tr>
+            <td>City:</td>
+            <td><!--input type="text" name="ct" id="ct">--><select id="ct" name="ct">
+                <option value="surat">--Select City--</option>
+                <option value="surat">Surat</option>
+                <option value="vapi">Vapi</option>
+                <option value="navsari">Navsari</option>
+            </select> </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><button type="button" id="addclk">Add</button> </td>
+        </tr>
+    </table>
+
+</form>
+<div id="disp"></div>
+</body>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css'>
+<script>
+    $(function(){
+        $('#addclk').click(function(e){
+            e.preventDefault();
+            //alert("in");
+            //console.log('select_link clicked');
+            var data={};
+            data.fnm=document.getElementById('fnm').value;
+            data.lnm=document.getElementById('lnm').value;
+            data.em=document.getElementById('em').value;
+            data.st=document.getElementById('st').value;
+            data.ct=document.getElementById('ct').value;
+            //alert("in1");
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: 'http://localhost:3000/insertdata',
+                success: function(data) {
+                    console.log('success');
+                    console.log(JSON.stringify(data));
+                    var html="<table id='example' class='display'>";
+                    for(x of data)
+                    {
+                        html+="<thead><tr>";
+                        for(d in x)
+                        {
+                            if(d=="_id" || d=="__v")
+                                continue;
+                            html+="<th>"+d+"</th>";
+                        }
+                        html+="<th>Update</th><th>Delete</th>";
+                        html+="</tr></thead>";
+                        break;
+                    }
+                    for(x of data){
+                        //console.log(x);
+                        html+="<tr>";
+                        for(d in x)
+                        {
+                            if(d=="_id" || d=="__v")
+                                continue;
+                            //console.log(d);
+                            html+="<td>"+x[d]+"</td>";
+                        }
+                        html+="<td><a href='update.html?oid="+x['_id']+"'> Update</a></td><td><a href='delete.html?oid="+x['_id']+"'> Delete</a></td>";
+                        html+="</tr>";
+                    }
+                    html+="</table>";
+                    //html+=""
+                    $('#disp').html(html);
+                    $(document).ready(function() {
+                        $('#example').DataTable();
+                    } );
+                }
+
+            });
+
+        });
+        /*$('#addclk').click(function(e){
+
+        });*/
+    });
+    $(document).ready(function() {
+        //alert("dov");
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:3000/view',
+            success: function(data) {
+                var html="<table id='example' class='display'>";
+                for(x of data)
+                {
+                    html+="<thead><tr>";
+                    for(d in x)
+                    {
+                        if(d=="_id" || d=="__v")
+                            continue;
+                        html+="<th>"+d+"</th>";
+                    }
+                    html+="<th>Update</th><th>Delete</th>";
+                    html+="</tr></thead>";
+                    break;
+                }
+                html+="<tbody>";
+                for(x of data){
+                    //console.log(x);
+                    html+="<tr>";
+                    for(d in x)
+                    {
+                        if(d=="_id" || d=="__v")
+                            continue;
+                        //console.log(d);
+                        html+="<td>"+x[d]+"</td>";
+                    }
+                    html+="<td><a href='update.html?oid="+x['_id']+"'> Update</a></td><td><a href='delete.html?oid="+x['_id']+"'> Delete</a></td>";
+
+                    html+="</tr>";
+                }
+                html+="</tbody>";
+                html+="</table>";
+                //html+="<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css'>";
+                $('#disp').html(html);
+                $(document).ready(function() {
+                    $('#example').DataTable();
+                } );
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:3000/states',
+            success: function(data) {
+                console.log(data);
+                $('select#st').empty();
+                $('select#st').append("<option>Select State</option>");
+                for(x in data){
+                    $('select#st').append("<option value='"+data[x].nm+"'>"+ data[x].nm +"</option>");
+                }
+            }
+        });
+
+
+    } );
+    $(function(){
+        $('#st').change(function(e){
+            var data={};
+            data.st=document.getElementById('st').value;
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: 'http://localhost:3000/city',
+                success: function(data) {
+                    console.log(data);
+                    $('select#ct').empty();
+                    $('select#ct').append("<option>Select City</option>");
+                    for(x in data){
+                        $('select#ct').append("<option value='"+data[x].nm+"'>"+ data[x].nm +"</option>");
+                    }
+                }
+            });
+        });
+    });
+
+
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css'>
+<script>
+    </script>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script>
+        $(document).ready(function() {
+            //alert("dov");
+            var data={};
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var c = url.searchParams.get("oid");
+            console.log(c);
+            data.id=c;
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: 'http://localhost:3000/delete',
+                success: function(data) {
+                    console.log('success');
+                    console.log(JSON.stringify(data));
+                    //header.location("");
+                    location.href ="index.html";
+                }
+
+            });
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

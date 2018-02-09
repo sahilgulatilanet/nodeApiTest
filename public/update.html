@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script>
+        $(document).ready(function() {
+            //alert("dov");
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:3000/states',
+                success: function(data) {
+                    console.log(data);
+                    $('select#st').empty();
+                    $('select#st').append("<option>Select State</option>");
+                    for(x in data){
+                        $('select#st').append("<option value='"+data[x].nm+"'>"+ data[x].nm +"</option>");
+                    }
+                }
+            });
+            var data={};
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var c = url.searchParams.get("oid");
+            console.log(c);
+            data.id=c;
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: 'http://localhost:3000/updatedata',
+                success: function(data) {
+                    console.log('success');
+                    console.log(JSON.stringify(data));
+                    //header.location("");
+                    //location.href ="index.html";
+                    document.getElementById('fnm').value=data.fnm;
+                    document.getElementById('lnm').value=data.lnm;
+                    document.getElementById('em').value=data.em;
+                    document.getElementById('st').value=data.st;
+                    var cityy=data.city;
+                    document.getElementById('ct').value=data.city;
+                    document.getElementById('oid').value=data._id;
+                    var data={};
+                    data.st=document.getElementById('st').value;
+                    $.ajax({
+                        type: 'POST',
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+                        url: 'http://localhost:3000/city',
+                        success: function(data) {
+                            console.log(data);
+                            $('select#ct').empty();
+                            $('select#ct').append("<option>Select City</option>");
+                            for(x in data){
+                                $('select#ct').append("<option value='"+data[x].nm+"'>"+ data[x].nm +"</option>");
+                            }
+                            document.getElementById('ct').value=cityy;
+                        }
+                    });
+                    //document.getElementById('ct').value=data.city;
+                }
+
+            });
+
+        });
+        $(function(){
+            $('#updclk').click(function(e){
+                var data={};
+                data.fnm=document.getElementById('fnm').value;
+                data.lnm=document.getElementById('lnm').value;
+                data.em=document.getElementById('em').value;
+                data.st=document.getElementById('st').value;
+                data.city=document.getElementById('ct').value;
+                data.id=document.getElementById('oid').value;
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    url: 'http://localhost:3000/update',
+                    success: function(data) {
+                        console.log('success');
+                        console.log(JSON.stringify(data));
+                        //header.location("");
+                        location.href ="index.html";
+                    }
+
+                });
+            });
+        });
+        $(function(){
+            $('#st').change(function(e){
+                var data={};
+                data.st=document.getElementById('st').value;
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    url: 'http://localhost:3000/city',
+                    success: function(data) {
+                        console.log(data);
+                        $('select#ct').empty();
+                        $('select#ct').append("<option>Select City</option>");
+                        for(x in data){
+                            $('select#ct').append("<option value='"+data[x].nm+"'>"+ data[x].nm +"</option>");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<form>
+    <input type="hidden" name="oid" id="oid">
+    <table>
+        <tr>
+            <td>First Name:</td>
+            <td><input type="text" name="fnm" id="fnm"></td>
+        </tr>
+        <tr>
+            <td>Last Name:</td>
+            <td><input type="text" name="lnm" id="lnm"></td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td><input type="text" name="em" id="em"></td>
+        </tr>
+        <tr>
+            <td>State:</td>
+            <td><select id="st" name="st">
+
+                <option value="gujarat">Gujarat</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>City:</td>
+            <td><select id="ct" name="ct">
+
+                <option value="surat">Surat</option>
+                <option value="vapi">Vapi</option>
+                <option value="navsari">Navsari</option></select></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><button type="button" id="updclk">Update</button> </td>
+        </tr>
+    </table>
+
+</form>
+</body>
+</html>
